@@ -1,6 +1,6 @@
 # Docs Stash
 
-Open-source documents site (Terms of Privacy, Terms of Service, etc.) with dark theme and multi-language support. Built with Vite + React + Express.
+**Docs Stash** — Document site for Terms of Service, Privacy Policy, and similar pages. A lightweight open-source app built with Vite, React, and Express. Multi-language Markdown content with automatic language detection, dark theme, last-updated dates from file mtime, and a REST API for managing documents with API key authentication. Supports local and proxied images, health check endpoint, and configurable company branding and redirect URL.
 
 ## Features
 
@@ -78,6 +78,7 @@ Copy `.env.example` to `.env` and fill in the values.
 
 ## API
 
+- `GET /api/health` — Health check (no API key). Returns `{ status, timestamp, version }`.
 - `GET /api/documents` — List all documents and languages
 - `GET /api/documents/:slug/:lang` — Get markdown content
 - `POST /api/documents` — Manage documents (requires `Authorization: Bearer API_KEY`)
