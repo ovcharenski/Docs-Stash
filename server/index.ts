@@ -244,13 +244,31 @@ if (isDev) {
       },
     },
   });
+  // Обрабатываем HTML и favicon ДО Vite — иначе WebSocket-слой отвечает 426
+  const viteRequest = /^\/(src|@vite|_vite|node_modules|@id|@react-refresh)\//;
+  const isStaticAsset = /\.(js|tsx?|css|json|map|ico|png|jpg|svg|woff2?)(\?.*)?$/;
+  app.use(async (req, res, next) => {
+    if (req.method !== 'GET') return next();
+    const p = req.path;
+    if (p === '/icon.ico' || p === '/favicon.ico') {
+      const ico = path.join(process.cwd(), 'public', 'icon.ico');
+      if (fs.existsSync(ico)) return res.sendFile(ico);
+      return next();
+    }
+    if (viteRequest.test(p) || isStaticAsset.test(p)) return next();
+    try {
+      const template = await vite.transformIndexHtml(
+        req.originalUrl,
+        await fs.promises.readFile(path.resolve(process.cwd(), 'index.html'), 'utf-8')
+      );
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+    } catch (e) {
+      next(e);
+    }
+  });
   app.use(vite.middlewares);
 } else {
   app.use(express.static(__dirname));
-}
-
-// SPA fallback (prod only)
-if (!isDev) {
   app.get('*', (_req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
   });
