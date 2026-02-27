@@ -13,6 +13,13 @@ app.use(express.json());
 
 // API routes first (before Vite middleware)
 
+// Redirect / to PROJECT_PAGE_URL when set
+app.get('/', (req, res, next) => {
+  const url = process.env.PROJECT_PAGE_URL?.trim();
+  if (url) return res.redirect(302, url);
+  next();
+});
+
 // Health check (no API key required)
 app.get('/api/health', async (_req, res) => {
   try {
