@@ -111,7 +111,7 @@ app.get('/api/proxy-image', async (req, res) => {
       return res.status(400).json({ error: 'Not an image' });
     }
     const buffer = Buffer.from(await response.arrayBuffer());
-    res.set({ 'Content-Type': contentType, 'Cache-Control': 'public, max-age=3600' });
+    res.set({ 'Content-Type': contentType, 'Cache-Control': 'max-age=0, must-revalidate' });
     res.send(buffer);
   } catch (err) {
     console.error('Proxy image error:', err);
