@@ -3,6 +3,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import packageJson from '../package.json';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV !== 'production';
@@ -22,24 +23,11 @@ app.get('/', (req, res, next) => {
 
 // Health check (no API key required)
 app.get('/api/health', async (_req, res) => {
-  try {
-    const pkgPath = path.join(process.cwd(), 'package.json');
-    const pkgRaw = await fs.promises.readFile(pkgPath, 'utf-8');
-    const pkg = JSON.parse(pkgRaw) as { version?: string };
-
-    res.json({
-      status: 'healthy',
-      timestamp: Math.floor(Date.now() / 1000),
-      version: pkg.version ?? 'unknown',
-    });
-  } catch (error) {
-    console.error('Error in /api/health:', error);
-    res.status(500).json({
-      status: 'unhealthy',
-      timestamp: Math.floor(Date.now() / 1000),
-      version: 'unknown',
-    });
-  }
+  res.json({
+    status: 'healthy',
+    timestamp: Math.floor(Date.now() / 1000),
+    version: packageJson.version ?? 'unknown',
+  });
 });
 
 // API: config (env vars for client)
